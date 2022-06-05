@@ -32,3 +32,32 @@ resource "aws_instance" "test" {
   vpc_security_group_ids = [ aws_security_group.sg_test.id ]
 }
 ```
+
+3. Create varialbe
+
+```hcl
+variable "nginx_port" {
+  default = 3000
+  type = number
+}
+```
+
+4. Use variable in code
+
+```hcl
+ingress {
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port = var.nginx_port
+  protocol = "tcp"
+  to_port = var.nginx_port
+}
+```
+
+```hcl
+  user_data = <<-EOF
+              #!/bin/bash
+              amazon-linux-extras install docker -y
+              service docker start
+              docker run -d -p ${var.nginx_port}:80 nginx:alpine
+              EOF
+```

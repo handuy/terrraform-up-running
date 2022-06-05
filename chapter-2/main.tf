@@ -3,6 +3,16 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+variable "nginx_port" {
+  default = 3000
+  type = number
+}
+
+variable "ssh_port" {
+  default = 22
+  type = number
+}
+
 resource "aws_instance" "test" {
   ami = "ami-0bd6906508e74f692"
   instance_type = "t2.micro"
@@ -11,7 +21,7 @@ resource "aws_instance" "test" {
               #!/bin/bash
               amazon-linux-extras install docker -y
               service docker start
-              docker run -d -p 3000:80 nginx:alpine
+              docker run -d -p ${var.nginx_port}:80 nginx:alpine
               EOF
 
   tags = {
@@ -26,16 +36,16 @@ resource "aws_security_group" "sg_test" {
 
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
-    from_port = 3000
+    from_port = var.nginx_port
     protocol = "tcp"
-    to_port = 3000
+    to_port = var.nginx_port
   }
 
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
-    from_port = 22
+    from_port = var.ssh_port
     protocol = "tcp"
-    to_port = 22
+    to_port = var.ssh_port
   }
 
   egress {
