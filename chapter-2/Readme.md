@@ -112,3 +112,18 @@ resource "aws_autoscaling_group" "nginx" {
   }
 }
 ```
+
+6. Use S3 bucket as backend for storing TF state file
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket = "tf-state-515462467908"
+    key    = "global/s3/terraform.tfstate"
+    region = "ap-southeast-1"
+    profile = "admin-general"
+
+    dynamodb_table = "tf-state-lock"
+  }
+}
+```
