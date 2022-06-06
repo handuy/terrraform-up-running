@@ -3,6 +3,11 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+variable "http_port" {
+  default = 80
+  type = number
+}
+
 variable "nginx_port" {
   default = 3000
   type = number
@@ -68,6 +73,36 @@ resource "aws_autoscaling_group" "nginx" {
     id      = aws_launch_template.nginx.id
     version = "$Latest"
   }
+
+  target_group_arns = [ aws_lb_target_group.nginx.arn ]
+}
+
+resource "aws_lb_target_group" "nginx" {
+  name     = "tg-nginx"
+  port     = 3000
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.default.id
+}
+
+resource "aws_lb" "terraform_alb" {
+  name               = "terraform-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.sg_alb.id]
+  subnets            = data.aws_subnets.default.ids
+
+  enable_deletion_protection = false
+}
+
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.terraform_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.nginx.arn
+  }
 }
 
 resource "aws_security_group" "sg_test" {
@@ -85,6 +120,25 @@ resource "aws_security_group" "sg_test" {
     from_port = var.ssh_port
     protocol = "tcp"
     to_port = var.ssh_port
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_security_group" "sg_alb" {
+  name = "sg_alb"
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port = var.http_port
+    protocol = "tcp"
+    to_port = var.http_port
   }
 
   egress {
