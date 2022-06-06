@@ -3,6 +3,17 @@ provider "aws" {
   region = "ap-southeast-1"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "tf-state-515462467908"
+    key    = "global/s3/terraform.tfstate"
+    region = "ap-southeast-1"
+    profile = "admin-general"
+
+    dynamodb_table = "tf-state-lock"
+  }
+}
+
 variable "http_port" {
   default = 80
   type = number
