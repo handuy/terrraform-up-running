@@ -10,3 +10,24 @@
       package:
         name: nginx
         state: present
+
+    - name: Copy nginx file
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Enable config
+      file:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+
+    - name: Copy index file
+      copy:
+        src: index.html
+        dest: /usr/share/nginx/html
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted  
