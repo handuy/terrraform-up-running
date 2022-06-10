@@ -1,6 +1,11 @@
 - hosts: all  
   become: yes  
   tasks:
+    - name: Enable repo
+      package:
+        name: epel-release
+        state: present
+
     - name: Install nginx
       package:
         name: nginx
