@@ -11,6 +11,11 @@
         name: nginx
         state: present
 
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started 
+
     - name: Copy nginx file
       copy:
         src: nginx.conf
