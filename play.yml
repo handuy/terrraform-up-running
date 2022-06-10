@@ -2,9 +2,7 @@
   become: yes  
   tasks:
     - name: Enable repo
-      package:
-        name: epel-release
-        state: present
+      command: amazon-linux-extras enable nginx1
 
     - name: Install nginx
       package:
