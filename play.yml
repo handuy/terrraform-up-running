@@ -24,8 +24,8 @@
         group: root
         mode: 0644
       loop:
-        - /etc/nginx/sites-available/default
-        - /etc/nginx/sites-enabled/default
+        - /etc/nginx/sites-available
+        - /etc/nginx/sites-enabled
 
     - name: Copy nginx file
       copy:
