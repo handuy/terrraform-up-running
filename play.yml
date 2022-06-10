@@ -1,5 +1,6 @@
 - hosts: all  
   become: yes  
+  ansible_become_password: "{{ vault_pass }}"
   tasks:
     - name: Enable repo
       command: amazon-linux-extras enable nginx1
