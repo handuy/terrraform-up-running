@@ -16,6 +16,17 @@
         name: nginx
         state: started 
 
+    - name: Create sites-available & sites-enabled directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0644
+      loop:
+        - /etc/nginx/sites-available/default
+        - /etc/nginx/sites-enabled/default
+
     - name: Copy nginx file
       copy:
         src: nginx.conf
