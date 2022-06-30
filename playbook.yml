@@ -1,7 +1,6 @@
 - hosts: all  
   become: yes  
-  vars:
-    ansible_become_password: ansible
+  ansible_become_password: ansible
   tasks:
     - name: Creating prometheus group
       group: prometheus
