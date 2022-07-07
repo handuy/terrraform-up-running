@@ -73,7 +73,7 @@
 
     - name: Download prometheus service file
       get_url:
-        src: "https://raw.githubusercontent.com/handuy/terrraform-up-running/master/prometheus.service"
+        url: "https://raw.githubusercontent.com/handuy/terrraform-up-running/master/prometheus.service"
         dest: /etc/systemd/system/prometheus.service
 
     - name: Reload systemd daemon
