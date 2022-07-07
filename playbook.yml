@@ -1,4 +1,4 @@
-- hosts: all  
+- hosts: slave  
   become: yes  
   vars:
     ansible_become_pass: ansible
@@ -20,11 +20,11 @@
 
     - name: Download prometheus binary
       get_url:
-        src: "https://github.com/prometheus/prometheus/releases/download/v2.36.2/prometheus-2.36.2.linux-amd64.tar.gz"
+        url: "https://github.com/prometheus/prometheus/releases/download/v2.36.2/prometheus-2.36.2.linux-amd64.tar.gz"
         dest: /tmp/
 
     - name: Unzip prometheus binary
-      get_url:
+      unarchive:
         src: /tmp/prometheus-2.36.2.linux-amd64.tar.gz
         dest: /tmp/
 
