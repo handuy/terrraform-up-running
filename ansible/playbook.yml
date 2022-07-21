@@ -1,0 +1,86 @@
+- hosts: slave  
+  become: yes  
+  vars:
+    ansible_become_pass: ansible
+  tasks:
+    - name: Creating prometheus group
+      group: 
+        name: prometheus
+        state: present
+        system: yes
+
+    - name: Creating prometheus user
+      user:
+        name: prometheus
+        group: prometheus
+        system: yes
+        shell: /sbin/nologin
+        createhome: "no"
+        state: present
+
+    - name: Download prometheus binary
+      get_url:
+        url: "https://github.com/prometheus/prometheus/releases/download/v2.36.2/prometheus-2.36.2.linux-amd64.tar.gz"
+        dest: /tmp/
+
+    - name: Unzip prometheus binary
+      unarchive:
+        src: /tmp/prometheus-2.36.2.linux-amd64.tar.gz
+        dest: /tmp/
+
+    - name: Create prometheus directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: prometheus
+        group: prometheus
+        mode: 0775
+      loop:
+        - /etc/prometheus
+        - /var/lib/prometheus
+
+    - name: Copy prometheus binary file to bin
+      copy:
+        src: "{{ item }}"
+        dest: "/usr/local/bin"
+        owner: prometheus
+        group: prometheus
+        remote_src: yes
+        mode: "+x"
+      loop:
+        - /tmp/prometheus-2.36.2.linux-amd64/prometheus 
+        - /tmp/prometheus-2.36.2.linux-amd64/promtool
+
+    - name: Copy prometheus config dir to /etc/prometheus
+      copy:
+        src: "{{ item }}"
+        dest: "/etc/prometheus"
+        owner: prometheus
+        group: prometheus
+        remote_src: yes
+        mode: 0755
+      loop:
+        - /tmp/prometheus-2.36.2.linux-amd64/consoles/ 
+        - /tmp/prometheus-2.36.2.linux-amd64/console_libraries/
+
+    - name: Copy file prometheus.yml to /etc/prometheus
+      copy:
+        src: /tmp/prometheus-2.36.2.linux-amd64/prometheus.yml
+        dest: /etc/prometheus/prometheus.yml
+        remote_src: yes
+        owner: prometheus
+        group: prometheus
+
+    - name: Download prometheus service file
+      get_url:
+        url: "https://raw.githubusercontent.com/handuy/terrraform-up-running/master/prometheus.service"
+        dest: /etc/systemd/system/prometheus.service
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Start systemd prometheus
+      systemd:
+        name: prometheus.service
+        state: started
