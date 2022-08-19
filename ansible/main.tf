@@ -1,5 +1,5 @@
 provider "aws" {
-  profile = "admin-general"
+  profile = "duy"
   region = "ap-southeast-1"
 }
 
