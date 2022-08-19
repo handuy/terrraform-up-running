@@ -40,3 +40,8 @@ module "kops" {
   sg_ssh_id = module.vpc.sg_ssh_id
   instance_profile = module.iam.instance_profile_id
 }
+
+resource "local_file" "foo" {
+    content  = module.kops.instance_public_ip
+    filename = "test"
+}

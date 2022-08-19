@@ -1,0 +1,10 @@
+- hosts: all  
+  become: yes  
+  vars:
+    ansible_become_pass: ansible
+  tasks:
+    - name: restart a particular instance by its ID
+      amazon.aws.ec2_instance:
+        state: restarted
+        instance_ids:
+          - i-12345678
